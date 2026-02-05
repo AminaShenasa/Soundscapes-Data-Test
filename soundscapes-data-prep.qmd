@@ -1,0 +1,94 @@
+---
+title: "soundscapes-data-prep"
+format: html
+editor: visual
+---
+
+## Filtering the data
+
+### Urchin Barren Sites
+
+### - Harris Island, HydroMoth 12
+
+```{r}
+#reading in the data
+library(here)
+harris_island <- read.csv("data/macro_forest_sites/harris_island_hydromoth12.csv")
+```
+
+### Filtering to sync time duration across forest and barren sites
+
+```{r}
+library(dplyr)
+library(lubridate)
+
+# Define your range
+start_datetime <- ymd_hms("2025-07-23 23:59:43", tz = "UTC")
+end_datetime   <- ymd_hms("2025-07-28 23:59:32", tz = "UTC")
+
+filtered_harris_island <- harris_island %>%
+  # 1. Remove any leading/trailing whitespace from the columns
+  mutate(
+    DATE..UTC. = trimws(DATE..UTC.),
+    TIME..UTC. = trimws(TIME..UTC.)
+  ) %>%
+  # 2. Combine and convert, silencing the 'parse failed' warning
+  mutate(
+    full_datetime = ymd_hms(
+      paste(DATE..UTC., TIME..UTC.), 
+      tz = "UTC", 
+      truncated = 3, 
+      quiet = TRUE
+    )
+  ) %>%
+  # 3. Filter out the NAs (the 112 failed rows) and apply your date range
+  filter(!is.na(full_datetime)) %>%
+  filter(between(full_datetime, start_datetime, end_datetime))
+
+# Check the final count
+nrow(filtered_harris_island)
+
+
+```
+
+### - Crow Island, HydroMoth 0.5
+
+```{r}
+#reading in the data
+library(here)
+crow_island <- read.csv("data/macro_forest_sites/crow_island_hydromoth0.5.csv")
+```
+
+### Filtering to sync time duration across forest and barren sites
+
+```{r}
+library(dplyr)
+library(lubridate)
+
+# Define your range
+start_datetime <- ymd_hms("2025-07-23 23:59:43", tz = "UTC")
+end_datetime   <- ymd_hms("2025-07-28 23:59:32", tz = "UTC")
+
+filtered_crow_island <- harris_island %>%
+  # 1. Remove any leading/trailing whitespace from the columns
+  mutate(
+    DATE..UTC. = trimws(DATE..UTC.),
+    TIME..UTC. = trimws(TIME..UTC.)
+  ) %>%
+  # 2. Combine and convert, silencing the 'parse failed' warning
+  mutate(
+    full_datetime = ymd_hms(
+      paste(DATE..UTC., TIME..UTC.), 
+      tz = "UTC", 
+      truncated = 3, 
+      quiet = TRUE
+    )
+  ) %>%
+  # 3. Filter out the NAs (the 112 failed rows) and apply your date range
+  filter(!is.na(full_datetime)) %>%
+  filter(between(full_datetime, start_datetime, end_datetime))
+
+# Check the final count
+nrow(filtered_harris_island)
+
+```
