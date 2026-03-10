@@ -6,7 +6,9 @@ editor: visual
 
 ## Tidying the data
 
-### UPC data: transforming forest and barren sites to be in same format
+### UPC data
+
+### - transforming forest and barren sites to be in same format
 
 Transforming forested sites to long format
 
@@ -24,7 +26,7 @@ names(upc_forests)
 library(tidyverse)
 
 # convert wide 5m segments to long 10m segments
-long_upc_forests <- upc_forests %>%
+old_long_upc_forests <- upc_forests %>%
   
   # rename 5 m segment column
   rename(SEGMENT5 = `SEGMENT.OF.THE.TRANSECT`) %>%
@@ -51,9 +53,9 @@ long_upc_forests <- upc_forests %>%
   mutate(
     SEG_START = as.numeric(str_extract(SEGMENT5, "^[0-9]+")),
     SEGMENT = case_when(
-      SEG_START < 10 ~ "0-10",
-      SEG_START < 20 ~ "10-20",
-      TRUE ~ "20-30"
+      SEG_START < 10 ~ "0-10m",
+      SEG_START < 20 ~ "10-20m",
+      TRUE ~ "20-30m"
     )
   ) %>%
   
@@ -76,4 +78,20 @@ long_upc_forests <- upc_forests %>%
     SEGMENT,
     CATEGORY
   )
+# saving file to cleaned_data folder
+write_csv(old_long_upc_forests, "data/ecological_data/cleaned_data/old_long_upc_forests.csv")
+
+#tidying CLASSCODE column and adding in NAME column
+
+```
+
+Renaming barren file to match long forest file
+
+```{r}
+library(here)
+#renaming file
+long_upc_barrens <- read.csv("data/ecological_data/Summer_Soundscapes_UPC_barrens - data_filtered.csv")
+
+# saving file to cleaned_data folder
+write_csv(long_upc_barrens, "data/ecological_data/cleaned_data/long_upc_barrens.csv")
 ```
